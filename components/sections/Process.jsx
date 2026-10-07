@@ -15,23 +15,13 @@ const BADGE_COLORS = [
   "from-emerald-500 to-teal-500",
 ];
 
-// Each step row height in px — controls spacing between steps
 const ROW_HEIGHT = 160;
-// Top offset before first step
 const START_Y = 20;
-// Total container height
 const TOTAL_H = START_Y + ROW_HEIGHT * PROCESS.length + 40;
+const MID_X = 400;
+const LEFT_X = 170;
+const RIGHT_X = 630;
 
-// X positions for left-side and right-side content (as % of 800px viewBox)
-const LEFT_X = 170;   // center-x of left card
-const RIGHT_X = 630;  // center-x of right card
-const MID_X = 400;    // center of canvas — where badge sits
-
-/**
- * Build snake path that:
- *  - starts at MID_X, step-0 Y
- *  - for each step: drops vertical to badge Y, curves horizontally to next side, drops to next badge
- */
 function buildPath(steps) {
   const pts = steps.map((_, i) => ({
     y: START_Y + i * ROW_HEIGHT + ROW_HEIGHT / 2,
@@ -41,24 +31,16 @@ function buildPath(steps) {
   let d = `M ${MID_X} 0`;
 
   pts.forEach((pt, i) => {
-    const prev = pts[i - 1];
     const next = pts[i + 1];
-
-    // Vertical drop to badge level
     d += ` L ${MID_X} ${pt.y}`;
-
     if (next) {
-      // Curve to the opposite side then back to center for next badge
       const midY = pt.y + ROW_HEIGHT / 2;
       const targetX = next.isLeft ? LEFT_X + 60 : RIGHT_X - 60;
-      // curve out
       d += ` C ${MID_X} ${midY}, ${targetX} ${midY}, ${targetX} ${pt.y + ROW_HEIGHT * 0.7}`;
-      // curve back
       d += ` C ${targetX} ${pt.y + ROW_HEIGHT * 0.9}, ${MID_X} ${next.y - 20}, ${MID_X} ${next.y}`;
     }
   });
 
-  // tail
   d += ` L ${MID_X} ${TOTAL_H}`;
   return d;
 }
@@ -85,21 +67,21 @@ function ZigzagPath({ inView }) {
         </linearGradient>
       </defs>
 
-      {/* Glow / shadow path */}
+      {/* Glow */}
       <motion.path
         d={pathD}
         stroke="url(#snakeGrad)"
-        strokeWidth="6"
+        strokeWidth="8"
         strokeLinecap="round"
         strokeLinejoin="round"
         fill="none"
-        opacity="0.15"
+        opacity="0.12"
         strokeDasharray={totalLen}
         initial={{ strokeDashoffset: totalLen }}
         animate={inView ? { strokeDashoffset: 0 } : {}}
-        transition={{ duration: 2.2, ease: "easeInOut" }}
+        transition={{ duration: 2.4, ease: "easeInOut", delay: 0.2 }}
       />
-      {/* Main path */}
+      {/* Main */}
       <motion.path
         d={pathD}
         stroke="url(#snakeGrad)"
@@ -110,25 +92,25 @@ function ZigzagPath({ inView }) {
         strokeDasharray={totalLen}
         initial={{ strokeDashoffset: totalLen }}
         animate={inView ? { strokeDashoffset: 0 } : {}}
-        transition={{ duration: 2.2, ease: "easeInOut" }}
+        transition={{ duration: 2.4, ease: "easeInOut", delay: 0.2 }}
       />
     </svg>
   );
 }
 
-function StepBadge({ step, index, inView }) {
+function StepBadge({ index, step, inView }) {
   return (
     <motion.div
-      initial={{ scale: 0, opacity: 0 }}
-      animate={inView ? { scale: 1, opacity: 1 } : {}}
+      initial={{ scale: 0, opacity: 0, rotate: -10 }}
+      animate={inView ? { scale: 1, opacity: 1, rotate: 0 } : {}}
       transition={{
         type: "spring",
         stiffness: 300,
         damping: 18,
-        delay: 0.3 + index * 0.25,
+        delay: 0.4 + index * 0.3,
       }}
       className={`w-10 h-10 rounded-xl bg-gradient-to-br ${BADGE_COLORS[index]}
-        flex items-center justify-center shadow-xl shadow-black/30 flex-shrink-0 z-10`}
+        flex items-center justify-center shadow-xl shadow-black/25 z-10 flex-shrink-0`}
     >
       <span className="text-white font-black text-sm leading-none">{step.step}</span>
     </motion.div>
@@ -138,34 +120,61 @@ function StepBadge({ step, index, inView }) {
 function StepCard({ step, index, isLeft, inView }) {
   return (
     <motion.div
-      initial={{ opacity: 0, x: isLeft ? -36 : 36 }}
-      animate={inView ? { opacity: 1, x: 0 } : {}}
+      initial={{
+        opacity: 0,
+        x: isLeft ? -50 : 50,
+        y: 10,
+      }}
+      animate={inView ? { opacity: 1, x: 0, y: 0 } : {}}
       transition={{
-        duration: 0.55,
+        duration: 0.6,
         ease: [0.25, 0.4, 0.25, 1],
-        delay: 0.25 + index * 0.2,
+        delay: 0.5 + index * 0.3,
       }}
       className={`flex items-start gap-3 ${isLeft ? "" : "flex-row-reverse"}`}
     >
       {/* Emoji icon */}
-      <div
+      <motion.div
+        initial={{ scale: 0.6, opacity: 0 }}
+        animate={inView ? { scale: 1, opacity: 1 } : {}}
+        transition={{
+          type: "spring",
+          stiffness: 260,
+          damping: 16,
+          delay: 0.65 + index * 0.3,
+        }}
         className={`w-11 h-11 rounded-xl text-xl flex items-center justify-center
           flex-shrink-0 border ${step.bg}`}
         aria-hidden="true"
       >
         {EMOJIS[index]}
-      </div>
+      </motion.div>
 
       <div className={isLeft ? "text-left" : "text-right"}>
-        <p className={`text-xs font-bold uppercase tracking-widest mb-0.5 ${step.color}`}>
+        <motion.p
+          initial={{ opacity: 0, y: 8 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.4, delay: 0.7 + index * 0.3 }}
+          className={`text-xs font-bold uppercase tracking-widest mb-0.5 ${step.color}`}
+        >
           Step {step.step}
-        </p>
-        <h3 className="font-bold text-sm text-[var(--text-primary)] mb-1 leading-snug">
+        </motion.p>
+        <motion.h3
+          initial={{ opacity: 0, y: 8 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.4, delay: 0.75 + index * 0.3 }}
+          className="font-bold text-sm text-[var(--text-primary)] mb-1 leading-snug"
+        >
           {step.title}
-        </h3>
-        <p className="text-xs text-[var(--text-secondary)] leading-relaxed max-w-[210px]">
+        </motion.h3>
+        <motion.p
+          initial={{ opacity: 0, y: 8 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.4, delay: 0.8 + index * 0.3 }}
+          className="text-xs text-[var(--text-secondary)] leading-relaxed max-w-[210px]"
+        >
           {step.description}
-        </p>
+        </motion.p>
       </div>
     </motion.div>
   );
@@ -173,12 +182,12 @@ function StepCard({ step, index, isLeft, inView }) {
 
 export default function Process() {
   const sectionRef = useRef(null);
-  const inView = useInView(sectionRef, { once: true, margin: "-80px" });
+  const inView = useInView(sectionRef, { once: true, margin: "-60px" });
 
   return (
     <section
       ref={sectionRef}
-      className="relative overflow-hidden py-16 md:py-20"
+      className="relative overflow-hidden py-12 md:py-16"
       aria-labelledby="process-heading"
     >
       <div className="absolute inset-0 bg-[var(--bg-secondary)]" aria-hidden="true" />
@@ -189,14 +198,13 @@ export default function Process() {
       />
 
       <div className="relative max-w-5xl mx-auto px-5 sm:px-8">
-        {/* Heading */}
+
+        {/* ── Heading ── */}
         <StaggerContainer className="text-center mb-12">
           <StaggerItem>
-            <span
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full
               border border-[var(--accent)]/30 bg-[var(--accent)]/8
-              text-[var(--accent)] text-sm font-medium mb-4"
-            >
+              text-[var(--accent)] text-sm font-medium mb-4">
               How We Work
             </span>
           </StaggerItem>
@@ -222,14 +230,11 @@ export default function Process() {
           className="hidden md:block relative w-full"
           style={{ height: `${TOTAL_H}px` }}
         >
-          {/* SVG snake path */}
           <ZigzagPath inView={inView} />
 
-          {/* Step rows */}
           {PROCESS.map((step, index) => {
             const isLeft = index % 2 === 0;
             const badgeY = START_Y + index * ROW_HEIGHT + ROW_HEIGHT / 2;
-            // As percentage of TOTAL_H for absolute positioning
             const topPct = `${(badgeY / TOTAL_H) * 100}%`;
 
             return (
@@ -238,19 +243,19 @@ export default function Process() {
                 className="absolute w-full flex items-center"
                 style={{ top: topPct, transform: "translateY(-50%)" }}
               >
-                {/* Left side card */}
+                {/* Left card */}
                 <div className="w-[42%] flex justify-end pr-6">
                   {isLeft && (
                     <StepCard step={step} index={index} isLeft={true} inView={inView} />
                   )}
                 </div>
 
-                {/* Center badge — fixed at 50% */}
+                {/* Center badge */}
                 <div className="w-[16%] flex justify-center relative z-10">
                   <StepBadge step={step} index={index} inView={inView} />
                 </div>
 
-                {/* Right side card */}
+                {/* Right card */}
                 <div className="w-[42%] flex justify-start pl-6">
                   {!isLeft && (
                     <StepCard step={step} index={index} isLeft={false} inView={inView} />
@@ -269,31 +274,56 @@ export default function Process() {
             aria-hidden="true"
           />
 
-          <div className="space-y-6 pl-14">
+          <div className="space-y-5 pl-14">
             {PROCESS.map((step, index) => (
               <motion.div
                 key={step.step}
-                initial={{ opacity: 0, x: -20 }}
+                initial={{ opacity: 0, x: -24 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true, margin: "-30px" }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
+                transition={{
+                  duration: 0.55,
+                  ease: [0.25, 0.4, 0.25, 1],
+                  delay: index * 0.12,
+                }}
                 className="relative"
               >
                 {/* Badge on line */}
-                <div
+                <motion.div
+                  initial={{ scale: 0, opacity: 0 }}
+                  whileInView={{ scale: 1, opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{
+                    type: "spring",
+                    stiffness: 300,
+                    damping: 18,
+                    delay: index * 0.12 + 0.1,
+                  }}
                   className={`absolute -left-[3.6rem] top-1/2 -translate-y-1/2
                     w-10 h-10 rounded-xl bg-gradient-to-br ${BADGE_COLORS[index]}
                     flex items-center justify-center shadow-lg`}
                   aria-hidden="true"
                 >
                   <span className="text-white font-black text-sm">{step.step}</span>
-                </div>
+                </motion.div>
 
                 {/* Card */}
                 <div className={`p-4 rounded-2xl border ${step.bg} flex gap-3 items-start`}>
-                  <span className="text-2xl flex-shrink-0 mt-0.5" aria-hidden="true">
+                  <motion.span
+                    initial={{ scale: 0.5, opacity: 0 }}
+                    whileInView={{ scale: 1, opacity: 1 }}
+                    viewport={{ once: true }}
+                    transition={{
+                      type: "spring",
+                      stiffness: 260,
+                      damping: 16,
+                      delay: index * 0.12 + 0.2,
+                    }}
+                    className="text-2xl flex-shrink-0 mt-0.5"
+                    aria-hidden="true"
+                  >
                     {EMOJIS[index]}
-                  </span>
+                  </motion.span>
                   <div>
                     <p className={`text-xs font-bold uppercase tracking-widest mb-0.5 ${step.color}`}>
                       Step {step.step}

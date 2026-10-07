@@ -196,14 +196,14 @@
 
   /* Section padding */
   .section {
-    padding-top: 4rem;
-    padding-bottom: 4rem;
+    padding-top: 3rem;
+    padding-bottom: 3rem;
   }
 
   @media (min-width: 768px) {
     .section {
-      padding-top: 5.5rem;
-      padding-bottom: 5.5rem;
+      padding-top: 4rem;
+      padding-bottom: 4rem;
     }
   }
 
@@ -261,6 +261,11 @@
 @keyframes marquee {
   0% { transform: translateX(0%); }
   100% { transform: translateX(-50%); }
+}
+
+@keyframes marquee-reverse {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(0%); }
 }
 
 /* ─── Reduced Motion ─── */

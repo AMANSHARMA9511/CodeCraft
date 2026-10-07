@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Process from "@/components/sections/Process";
 import TechStack from "@/components/sections/TechStack";
+import Clients from "@/components/sections/Clients";
 import CTA from "@/components/sections/CTA";
 import { StaggerContainer, StaggerItem } from "@/components/animations/StaggerContainer";
 
@@ -203,6 +204,7 @@ export default function AboutPage() {
       </div>
 
       <TechStack />
+      <Clients />
       <CTA />
     </div>
   );

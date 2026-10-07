@@ -3,6 +3,7 @@ import ServicesGrid from "@/components/sections/ServicesGrid";
 import FeaturedProjects from "@/components/sections/FeaturedProjects";
 import Process from "@/components/sections/Process";
 import TechStack from "@/components/sections/TechStack";
+import Clients from "@/components/sections/Clients";
 import Testimonials from "@/components/sections/Testimonials";
 import FAQ from "@/components/sections/FAQ";
 import CTA from "@/components/sections/CTA";
@@ -21,6 +22,7 @@ export default function HomePage() {
       <FeaturedProjects />
       <Process />
       <TechStack />
+      <Clients />
       <Testimonials />
       <FAQ />
       <CTA />

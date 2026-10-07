@@ -23,7 +23,8 @@ module.exports = {
         "gradient-x": "gradient-x 8s ease infinite",
         "spin-slow": "spin 8s linear infinite",
         blob: "blob 7s infinite",
-        marquee: "marquee 25s linear infinite",
+        marquee: "marquee 60s linear infinite",
+        "marquee-reverse": "marquee-reverse 50s linear infinite",
       },
       keyframes: {
         float: {
@@ -43,6 +44,10 @@ module.exports = {
         marquee: {
           "0%": { transform: "translateX(0%)" },
           "100%": { transform: "translateX(-50%)" },
+        },
+        "marquee-reverse": {
+          "0%": { transform: "translateX(-50%)" },
+          "100%": { transform: "translateX(0%)" },
         },
       },
       backgroundSize: {
